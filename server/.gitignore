@@ -1,0 +1,43 @@
+# Python
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+*.egg-info/
+.Python
+*.pyc
+venv/
+env/
+_pycache_/
+*.pyo
+.pytest_cache/
+
+# Flask
+instance/
+web/assets/
+*.log
+.env
+*.env
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# VSCode
+.vscode/
+.idea/
+*.code-workspace
+
+# Miscellaneous
+*.swp
+*~
