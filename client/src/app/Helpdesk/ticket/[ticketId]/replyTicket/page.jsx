@@ -1,5 +1,6 @@
 
 
+
 // "use client";
 
 // import { useState, useEffect } from "react";
@@ -10,12 +11,13 @@
 //   const router = useRouter();
 //   const searchParams = useSearchParams();
 //   const ticketId = searchParams.get("ticketId"); // Extract ticketId from query parameters
-//   const [title, setTitle] = useState("");
+//   const titleFromQuery = searchParams.get("title"); // Extract title from query parameters
+//   const [title, setTitle] = useState(titleFromQuery || "");
 //   const [description, setDescription] = useState("");
 //   const [attachments, setAttachments] = useState(null);
 
 //   useEffect(() => {
-//     if (ticketId) {
+//     if (!title && ticketId) {
 //       const fetchTicketTitle = async () => {
 //         try {
 //           const response = await axios.get(`http://localhost:8080/api/tickets/${ticketId}`, {
@@ -29,7 +31,7 @@
 
 //       fetchTicketTitle();
 //     }
-//   }, [ticketId]);
+//   }, [ticketId, title]);
 
 //   const handleDescriptionChange = (e) => {
 //     setDescription(e.target.value);
@@ -121,9 +123,7 @@
 //   );
 // }
 
-
-"use client";
-
+"use client"
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
@@ -136,6 +136,7 @@ export default function TicketReplyForm() {
   const [title, setTitle] = useState(titleFromQuery || "");
   const [description, setDescription] = useState("");
   const [attachments, setAttachments] = useState(null);
+  const [status, setStatus] = useState("open"); // State for dropdown list
 
   useEffect(() => {
     if (!title && ticketId) {
@@ -162,11 +163,16 @@ export default function TicketReplyForm() {
     setAttachments(e.target.files);
   };
 
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title); // Title is set from the fetched data
     formData.append("description", description);
+    formData.append("status", status); // Add status to the form data
 
     if (attachments) {
       for (let i = 0; i < attachments.length; i++) {
@@ -222,6 +228,18 @@ export default function TicketReplyForm() {
         </div>
 
         <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2">Status</label>
+          <select
+            value={status}
+            onChange={handleStatusChange}
+            className="w-full px-3 py-2 border rounded-lg"
+          >
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+
+        <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Attachments</label>
           <input
             type="file"
@@ -243,3 +261,4 @@ export default function TicketReplyForm() {
     </div>
   );
 }
+

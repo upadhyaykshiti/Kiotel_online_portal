@@ -433,7 +433,6 @@
 // }
 
 
-
 "use client";
 
 import { useState } from "react";
@@ -479,7 +478,7 @@ export default function TicketCreateForm() {
       });
 
       console.log("Ticket created successfully", response.data);
-      router.push("/thank-you");
+      router.push("/Helpdesk");
     } catch (error) {
       console.error("There was an error creating the ticket!", error);
       if (error.response) {
@@ -502,7 +501,7 @@ export default function TicketCreateForm() {
             type="text"
             value={title}
             onChange={handleTitleChange}
-            className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-700"
+            className="w-full px-3 py-2 border rounded-lg text-gray-700"
             required
           />
         </div>
@@ -540,3 +539,4 @@ export default function TicketCreateForm() {
     </div>
   );
 }
+
