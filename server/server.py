@@ -85,6 +85,7 @@ def login_user():
     finally:
         connection.close()
 
+
 @app.route("/api/user-email", methods=["GET"])
 @login_required
 def get_user_email():
@@ -98,10 +99,10 @@ def get_user_email():
 
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT emailid FROM tblusers WHERE id = %s", (user_id,))
+            cursor.execute("SELECT * FROM tblusers WHERE id = %s", (user_id,))
             user = cursor.fetchone()
             if user:
-                return jsonify({"email": user['emailid']})
+                return jsonify({"name": user['fname'], "role": user["role_id"]})
             else:
                 return jsonify({"error": "User not found"}), 404
     except pymysql.MySQLError as e:
@@ -112,8 +113,16 @@ def get_user_email():
 
 @app.route("/api/register", methods=["POST"])
 def register_user():
-    email = request.json["email"]
-    password = request.json["password"]
+    data = request.json
+    email = data["email"]
+    password = data["password"]
+    fname = data.get("fname")
+    lname = data.get("lname")
+    dob = data.get("dob")
+    address = data.get("address")
+    account_no = data.get("account_no")
+    mobileno = data.get("mobileno")
+    role_id = data.get("role_id", 2)  # Assuming 1 is the default role_id for new users
 
     connection = create_connection()
     if connection is None:
@@ -121,15 +130,18 @@ def register_user():
 
     try:
         with connection.cursor() as cursor:
+            # Check if the user already exists
             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
             user_exists = cursor.fetchone() is not None
 
             if user_exists:
                 return jsonify({"error": "User already exists"}), 409
 
-            cursor.callproc('Proc_tblUsers_RegisterUser', (email, password))
+            # Call the stored procedure to insert the new user
+            cursor.callproc('Proc_tblusers_Upsert2', (0, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
             connection.commit()
 
+            # Fetch the newly created user
             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
             new_user = cursor.fetchone()
 
@@ -145,6 +157,7 @@ def register_user():
         return jsonify({"error": "Database query failed"}), 500
     finally:
         connection.close()
+
 
 @app.route("/Dashboard")
 @login_required
@@ -296,59 +309,6 @@ def get_closed_tickets():
 
 
 
-# @app.route("/api/ticket", methods=["POST"])
-# @login_required
-# def create_ticket():
-#     user_id = session.get("user_id")
-
-#     if user_id is None:
-#         return jsonify({"error": "User ID not found in session"}), 400
-
-#     title = request.form.get("title")
-#     description = request.form.get("description")
-#     attachments = request.files.getlist("attachments")
-    
-
-#     if not title or not description:
-#         return jsonify({"error": "Title and description are required"}), 400
-
-#     connection = create_connection()
-#     if connection is None:
-#         return jsonify({"error": "Failed to connect to the database"}), 500
-
-#     try:
-#         attachment_filenames = []
-#         upload_folder = app.config['UPLOAD_FOLDER']
-
-#         with connection.cursor() as cursor:
-#             if attachments:
-#                 for attachment in attachments:
-#                     filename = attachment.filename
-#                     attachment_filenames.append(filename)
-#                     file_path = os.path.join(upload_folder, filename)
-#                     attachment.save(file_path)
-
-#             attachments_json = json.dumps(attachment_filenames)
-
-#             # Set the session variable for the current user ID
-#             cursor.execute("SET @current_user_id = %s", (user_id,))
-
-#             cursor.callproc('Proc_tbltickets_UpsertTicket', (0, title, description, attachments_json))
-#             connection.commit()
-
-#             cursor.execute("SELECT LAST_INSERT_ID() AS ticket_id")
-#             ticket_id = cursor.fetchone()["ticket_id"]
-
-#             return jsonify({"message": "Ticket created successfully", "ticket_id": ticket_id}), 201
-#     except pymysql.MySQLError as e:
-#         print(f"The error '{e}' occurred")
-#         return jsonify({"error": "Database query failed"}), 500
-#     except Exception as e:
-#         print(f"An unexpected error occurred: {e}")
-#         return jsonify({"error": str(e)}), 500
-#     finally:
-#         connection.close()
-
 @app.route("/api/ticket", methods=["POST"])
 @login_required
 def create_ticket():
@@ -406,48 +366,6 @@ def create_ticket():
         connection.close()
 
 
-
-
-
-
-# @app.route("/api/tickets/<int:ticket_id>", methods=["GET"])
-# @login_required
-# def get_ticket(ticket_id):
-#     connection = create_connection()
-#     if connection is None:
-#         return jsonify({"error": "Failed to connect to the database"}), 500
-
-#     try:
-#         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-#             cursor.callproc("Proc_tbltickets_DisplayticketsById", (ticket_id,))
-#             result = cursor.fetchall()
-            
-#             if not result:
-#                 return jsonify({"error": "Ticket not found"}), 404
-
-#             ticket = result[0]
-
-#             for key, value in ticket.items():
-#                 if isinstance(value, bytes):
-#                     ticket[key] = value.decode("utf-8")
-
-#             if 'attachments' in ticket and isinstance(ticket['attachments'], str):
-#                 try:
-#                     ticket['attachments'] = json.loads(ticket['attachments'])
-#                 except json.JSONDecodeError:
-#                     ticket['attachments'] = []
-
-#             return jsonify(ticket), 200
-#     except pymysql.MySQLError as e:
-#         print(f"The database error '{e}' occurred")
-#         return jsonify({"error": "Database query failed", "details": str(e)}), 500
-#     except Exception as e:
-#         print(f"An unexpected error occurred: {e}")
-#         return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
-#     finally:
-#         connection.close()
-
-
 @app.route("/api/tickets/<int:ticket_id>", methods=["GET"])
 @login_required
 def get_ticket(ticket_id):
@@ -486,47 +404,6 @@ def get_ticket(ticket_id):
         connection.close()
 
 
-
-
-# @app.route("/api/tickets/<int:ticket_id>", methods=["GET"])
-# @login_required
-# def get_ticket(ticket_id):
-#     connection = create_connection()
-#     if connection is None:
-#         return jsonify({"error": "Failed to connect to the database"}), 500
-
-#     try:
-#         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-#             cursor.callproc("Proc_tbltickets_DisplayticketsById", (ticket_id,))
-#             result = cursor.fetchall()
-
-#             # Debugging: Print result for verification
-#             print("Query Result:", result)
-
-#             if not result:
-#                 return jsonify({"error": "Ticket not found"}), 404
-
-#             ticket = result[0]
-
-#             for key, value in ticket.items():
-#                 if isinstance(value, bytes):
-#                     ticket[key] = value.decode("utf-8")
-
-#             if 'attachments' in ticket and isinstance(ticket['attachments'], str):
-#                 ticket['attachments'] = json.loads(ticket['attachments'])
-
-#             return jsonify(ticket), 200
-#     except pymysql.MySQLError as e:
-#         print(f"The error '{e}' occurred")
-#         return jsonify({"error": "Database query failed"}), 500
-#     except Exception as e:
-#         print(f"An unexpected error occurred: {e}")
-#         return jsonify({"error": "An unexpected error occurred"}), 500
-#     finally:
-#         connection.close()
-
-
-
 @app.route('/uploads/<filename>', methods=['GET'])
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
@@ -548,6 +425,32 @@ def get_status():
             print("Raw result:", status_options)
 
             return jsonify(status_options), 200
+
+    except pymysql.MySQLError as e:
+        print(f"The error '{e}' occurred")
+        return jsonify({"error": "Database query failed"}), 500
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An unexpected error occurred"}), 500
+    finally:
+        conn.close()
+
+
+@app.route('/api/roles', methods=['GET'])
+def get_roles():
+    conn = create_connection()
+    if conn is None:
+        return jsonify({"error": "Failed to connect to the database"}), 500
+
+    try:
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.callproc('Proc_tblrole_selectrolefordropdown')
+            roles_options = cursor.fetchall()
+            
+            # Print raw result for debugging
+            print("Raw result:", roles_options)
+
+            return jsonify(roles_options), 200
 
     except pymysql.MySQLError as e:
         print(f"The error '{e}' occurred")
@@ -666,6 +569,61 @@ def get_ticket_title(ticket_id):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return jsonify({"error": "An unexpected error occurred"}), 500
+    finally:
+        connection.close()
+
+
+
+# @app.route('/api/users', methods=['GET'])
+# def get_users():
+#     user_id = request.args.get('user_id', type=int)
+
+#     if not user_id:
+#         return jsonify({"error": "User ID is required"}), 400
+
+#     conn = create_connection()
+#     if conn is None:
+#         return jsonify({"error": "Failed to connect to the database"}), 500
+
+#     try:
+#         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+#             cursor.callproc('Proc_tblusers_displaylistofusers2', (user_id,))
+#             users = cursor.fetchall()
+
+#             if not users:
+#                 return jsonify({"error": "No user found with the given ID"}), 404
+
+#             return jsonify(users), 200
+
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return jsonify({"error": "Database query failed"}), 500
+
+#     finally:
+#         conn.close()
+
+
+
+# Route to display user details based on user ID
+@app.route('/api/user/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    connection = create_connection()
+    if connection is None:
+        return jsonify({"error": "Failed to connect to the database"}), 500
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.callproc('Proc_tblusers_displaylistofusers2', (user_id,))
+            user_details = cursor.fetchone()
+            
+            if not user_details:
+                return jsonify({"error": "User not found"}), 404
+
+            return jsonify(user_details)
+            
+    except pymysql.MySQLError as e:
+        print(f"The error '{e}' occurred")
+        return jsonify({"error": "Database query failed"}), 500
     finally:
         connection.close()
 
