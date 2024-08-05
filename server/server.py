@@ -85,6 +85,32 @@ def login_user():
     finally:
         connection.close()
 
+# @app.route("/api/user-email", methods=["GET"])
+# @login_required
+# def get_user_email():
+#     user_id = session.get("user_id")
+#     if not user_id:
+#         return jsonify({"error": "User not logged in"}), 401
+
+#     connection = create_connection()
+#     if connection is None:
+#         return jsonify({"error": "Failed to connect to the database"}), 500
+
+#     try:
+#         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+#             cursor.execute("SELECT emailid FROM tblusers WHERE id = %s", (user_id,))
+#             user = cursor.fetchone()
+#             if user:
+#                 return jsonify({"email": user['emailid']})
+#             else:
+#                 return jsonify({"error": "User not found"}), 404
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return jsonify({"error": "Database query failed"}), 500
+#     finally:
+#         connection.close()
+
+
 @app.route("/api/user-email", methods=["GET"])
 @login_required
 def get_user_email():
@@ -98,10 +124,10 @@ def get_user_email():
 
     try:
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT emailid FROM tblusers WHERE id = %s", (user_id,))
+            cursor.execute("SELECT * FROM tblusers WHERE id = %s", (user_id,))
             user = cursor.fetchone()
             if user:
-                return jsonify({"email": user['emailid']})
+                return jsonify({"name": user['fname'], "role": user["role_id"]})
             else:
                 return jsonify({"error": "User not found"}), 404
     except pymysql.MySQLError as e:
