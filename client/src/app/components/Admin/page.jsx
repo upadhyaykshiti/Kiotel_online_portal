@@ -109,7 +109,7 @@ import { FaBell, FaUserCircle } from 'react-icons/fa';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
 
- function Dashboard() {
+function Dashboard() {
   const [userFname, setUserFname] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -120,11 +120,12 @@ import DataTable from 'react-data-table-component';
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        // Fetch the current user details
         const response = await axios.get('http://localhost:8080/api/user-email', { withCredentials: true });
         setUserFname(response.data.name);
         setUserRole(response.data.role);
 
-        // Fetch all users data if needed for the table
+        // Fetch all users data for the table
         const usersResponse = await axios.get('http://localhost:8080/api/users', { withCredentials: true });
         setUsers(usersResponse.data);
       } catch (error) {
@@ -171,8 +172,12 @@ import DataTable from 'react-data-table-component';
       sortable: true,
     },
     {
-      name: 'Actions',
-      cell: row => <Link href={`/user/${row.id}`} className="text-blue-500 hover:underline">View</Link>,
+      name: '',
+      cell: row => <Link href={`/user/${row.id}`} className="text-blue-500 hover:underline">Update</Link>,
+    },
+    {
+      name: '',
+      cell: row => <Link href={`/user/${row.id}`} className="text-blue-500 hover:underline">Delete User</Link>,
     },
   ];
 
