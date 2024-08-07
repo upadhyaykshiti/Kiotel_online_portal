@@ -605,27 +605,78 @@ def get_ticket_title(ticket_id):
 
 
 # Route to display user details based on user ID
-@app.route('/api/user/<int:user_id>', methods=['GET'])
-def get_user(user_id):
+# @app.route('/api/users', methods=['GET'])
+# def get_users():
+#     connection = create_connection()
+#     if connection is None:
+#         return jsonify({"error": "Failed to connect to the database"}), 500
+
+#     try:
+#         with connection.cursor() as cursor:
+#             # Call the stored procedure to get the list of all users
+#             cursor.callproc('Proc_tblusers_displaylistofusers_test')
+#             users = cursor.fetchall()  # Fetch all results
+            
+#             if not users:
+#                 return jsonify({"error": "No users found"}), 404
+
+#             # Convert the result to a list of dictionaries
+#             users_list = []
+#             for user in users:
+#                 users_list.append({
+#                     "id": user[0],
+#                     "fname": user[1],
+#                     "lname": user[2],
+#                     "emailid": user[3],
+#                     "role": user[4],
+#                     # Add other fields as necessary
+#                 })
+
+#             return jsonify(users_list)
+            
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return jsonify({"error": "Database query failed"}), 500
+#     finally:
+#         connection.close()
+
+
+@app.route('/api/users', methods=['GET'])
+def get_users():
     connection = create_connection()
     if connection is None:
         return jsonify({"error": "Failed to connect to the database"}), 500
 
     try:
-        with connection.cursor() as cursor:
-            cursor.callproc('Proc_tblusers_displaylistofusers2', (user_id,))
-            user_details = cursor.fetchone()
+        with connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            # Call the stored procedure to get the list of all users
+            cursor.callproc('Proc_tblusers_displaylistofusers_test')
+            users = cursor.fetchall()  # Fetch all results
             
-            if not user_details:
-                return jsonify({"error": "User not found"}), 404
+            if not users:
+                return jsonify({"error": "No users found"}), 404
 
-            return jsonify(user_details)
+            # Convert the result to a list of dictionaries
+            users_list = []
+            for user in users:
+                users_list.append({
+                    "id": user['id'],
+                    "fname": user['fname'],
+                    "lname": user['lname'],
+                    "emailid": user['emailid'],
+                    "role": user['role'],
+                    # Add other fields as necessary
+                })
+
+            return jsonify(users_list)
             
     except pymysql.MySQLError as e:
         print(f"The error '{e}' occurred")
         return jsonify({"error": "Database query failed"}), 500
     finally:
         connection.close()
+
+
 
 
 
