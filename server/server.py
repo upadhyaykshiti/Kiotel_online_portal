@@ -24,13 +24,28 @@ UPLOAD_FOLDER = './uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the upload directory exists
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# def create_connection():
+#     try:
+#         connection = pymysql.connect(
+#             host="box2272.bluehost.com",
+#             user="travarit_test",
+#             password="Kiotel123!",
+#             database="travarit_login",
+#             cursorclass=pymysql.cursors.DictCursor
+#         )
+#         print("Successfully connected to the database")
+#         return connection
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return None
+
 def create_connection():
     try:
         connection = pymysql.connect(
-            host="box2272.bluehost.com",
-            user="travarit_test",
-            password="Kiotel123!",
-            database="travarit_login",
+            host="64.227.6.9",  # Replace with the public IP address of your VPS
+            user="kshiti",  # Replace with your MySQL user
+            password="Kiotel123!",  # Replace with your MySQL password
+            database="kiotel",  # Replace with your database name
             cursorclass=pymysql.cursors.DictCursor
         )
         print("Successfully connected to the database")
