@@ -148,7 +148,7 @@ export default function TicketCreateForm() {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/api/ticket", formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ticket`, formData, {
         withCredentials: true,  // Important for sending/receiving cookies
         headers: {
           "Content-Type": "multipart/form-data",

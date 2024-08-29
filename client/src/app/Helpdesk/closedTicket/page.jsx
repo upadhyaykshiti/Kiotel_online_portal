@@ -13,7 +13,7 @@ export default function ClosedTickets() {
   useEffect(() => {
     const fetchClosedTickets = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/closed_tickets", {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/closed_tickets`, {
           withCredentials: true,
         });
         setClosedTickets(response.data);

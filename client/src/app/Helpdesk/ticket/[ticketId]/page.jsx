@@ -17,10 +17,10 @@ export default function TicketDetails({ params }) {
       const fetchTicketDetails = async () => {
         try {
           const [ticketResponse, repliesResponse] = await Promise.all([
-            axios.get(`http://localhost:8080/api/tickets/${ticketId}`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/tickets/${ticketId}`, {
               withCredentials: true,
             }),
-            axios.get(`http://localhost:8080/api/ticket/${ticketId}/replies`, {
+            axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/ticket/${ticketId}/replies`, {
               withCredentials: true,
             }),
           ]);
@@ -73,30 +73,66 @@ export default function TicketDetails({ params }) {
           <p><strong className="font-medium text-gray-700">Title:</strong> {ticketDetails.title}</p>
           <p><strong className="font-medium text-gray-700">Created At:</strong> {new Date(ticketDetails.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</p>
           <p><strong className="font-medium text-gray-700">Status:</strong> {ticketDetails.status_name}</p>
+          <p><strong className="font-medium text-gray-700">Created_by:</strong> {ticketDetails.fname}</p>
         </div>
         <label htmlFor="">Descriptions</label>
         <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6">
           <p className="text-gray-700 whitespace-pre-line">{ticketDetails.description}</p>
         </div>
-
-        {replies.length > 0 && (
+{/*
+         {replies.length > 0 && (
           <div className="mt-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Replies:</h3>
             <div className="space-y-4">
               {replies.map((reply, index) => (
                 <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <p className="text-gray-700">
-                    <strong>{reply.emailid}</strong>
+                    <strong>{reply.fname}</strong>
                    <span className="text-sm text-gray-500">
                     {/* {new Date(reply.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} */}
-                    {new Date(reply.created_at).toLocaleString("en-US", { timeZone: "America/Chicago" })}
+                    {/* {new Date(reply.created_at).toLocaleString("en-US", { timeZone: "America/Chicago" })}
                     </span></p>
                   <p className="text-gray-700 mt-2 whitespace-pre-line">{reply.reply_text}</p>
                 </div>
               ))}
             </div>
           </div>
-        )}
+        )} */} 
+
+{replies.length > 0 && (
+  <div className="mt-8">
+    <h3 className="text-2xl font-bold text-gray-900 mb-6">Replies:</h3>
+    <div className="space-y-6">
+      {replies.map((reply, index) => (
+        <div
+          key={index}
+          className="bg-white border border-gray-300 shadow-sm rounded-lg p-5 transition-transform transform hover:-translate-y-1"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-lg font-semibold text-blue-600">
+              {reply.fname}
+            </p>
+            <span className="text-sm text-gray-400">
+              {new Date(reply.created_at).toLocaleString("en-US", {
+                timeZone: "America/Chicago",
+                weekday: "short",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+          <p className="text-gray-700 mt-4 leading-relaxed whitespace-pre-line">
+            {reply.reply_text}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
 
         {attachments.length > 0 && (
           <div className="mt-6">
@@ -105,13 +141,13 @@ export default function TicketDetails({ params }) {
               {attachments.map((attachment, index) => (
                 <div key={index} className="relative group overflow-hidden rounded-lg shadow-md">
                   <a
-                    href={`http://localhost:8080/uploads/${attachment}`}
+                    href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${attachment}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block"
                   >
                     <img
-                      src={`http://localhost:8080/uploads/${attachment}`}
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${attachment}`}
                       alt={`Attachment ${index + 1}`}
                       className="w-full h-32 object-cover transform transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />

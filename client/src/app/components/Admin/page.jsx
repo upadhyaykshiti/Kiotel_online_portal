@@ -16,7 +16,7 @@
 //   useEffect(() => {
 //     const fetchUserFname = async () => {
 //       try {
-//         const response = await axios.get('http://localhost:8080/api/user-email', { withCredentials: true });
+//         const response = await axios.get('${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-email', { withCredentials: true });
 //         setUserFname(response.data.name);
 //       } catch (error) {
 //         console.error("Failed to fetch user name:", error);
@@ -121,12 +121,12 @@ function Dashboard() {
     const fetchUserData = async () => {
       try {
         // Fetch the current user details
-        const response = await axios.get('http://localhost:8080/api/user-email', { withCredentials: true });
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-email`, { withCredentials: true });
         setUserFname(response.data.name);
         setUserRole(response.data.role);
 
         // Fetch all users data for the table
-        const usersResponse = await axios.get('http://localhost:8080/api/users', { withCredentials: true });
+        const usersResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users`, { withCredentials: true });
         setUsers(usersResponse.data);
       } catch (error) {
         console.error("Failed to fetch user data:", error);

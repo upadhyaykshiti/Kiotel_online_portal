@@ -126,9 +126,58 @@ def get_user_email():
     finally:
         connection.close()
 
+# @app.route("/api/register", methods=["POST"])
+# def register_user():
+#     data = request.json
+#     email = data["email"]
+#     password = data["password"]
+#     fname = data.get("fname")
+#     lname = data.get("lname")
+#     dob = data.get("dob")
+#     address = data.get("address")
+#     account_no = data.get("account_no")
+#     mobileno = data.get("mobileno")
+#     role_id = data.get("role_id", 2)  # Assuming 1 is the default role_id for new users
+
+#     connection = create_connection()
+#     if connection is None:
+#         return jsonify({"error": "Failed to connect to the database"}), 500
+
+#     try:
+#         with connection.cursor() as cursor:
+#             # Check if the user already exists
+#             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
+#             user_exists = cursor.fetchone() is not None
+
+#             if user_exists:
+#                 return jsonify({"error": "User already exists"}), 409
+
+#             # Call the stored procedure to insert the new user
+#             cursor.callproc('Proc_tblusers_Upsert', (0, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
+#             connection.commit()
+
+#             # Fetch the newly created user
+#             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
+#             new_user = cursor.fetchone()
+
+#             session["user_id"] = new_user['id']
+#             session.permanent = True  # Make the session permanent (cookie won't be deleted after the browser is closed)
+
+#             return jsonify({
+#                 "id": new_user['id'],
+#                 "email": new_user['emailid']
+#             })
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return jsonify({"error": "Database query failed"}), 500
+#     finally:
+#         connection.close()
+
+
 @app.route("/api/register", methods=["POST"])
 def register_user():
     data = request.json
+    user_id = data.get("id", 0)  # Get the user ID; default to 0 for new users
     email = data["email"]
     password = data["password"]
     fname = data.get("fname")
@@ -137,7 +186,7 @@ def register_user():
     address = data.get("address")
     account_no = data.get("account_no")
     mobileno = data.get("mobileno")
-    role_id = data.get("role_id", 2)  # Assuming 1 is the default role_id for new users
+    role_id = data.get("role_id", 2)  # Default role_id is 2
 
     connection = create_connection()
     if connection is None:
@@ -145,27 +194,20 @@ def register_user():
 
     try:
         with connection.cursor() as cursor:
-            # Check if the user already exists
-            cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
-            user_exists = cursor.fetchone() is not None
-
-            if user_exists:
-                return jsonify({"error": "User already exists"}), 409
-
-            # Call the stored procedure to insert the new user
-            cursor.callproc('Proc_tblusers_Upsert2', (0, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
+            # If user_id > 0, update the user; otherwise, insert a new user
+            cursor.callproc('Proc_tblusers_Upsert', (user_id, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
             connection.commit()
 
-            # Fetch the newly created user
+            # Fetch the user (whether newly created or updated)
             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
-            new_user = cursor.fetchone()
+            user = cursor.fetchone()
 
-            session["user_id"] = new_user['id']
-            session.permanent = True  # Make the session permanent (cookie won't be deleted after the browser is closed)
+            session["user_id"] = user['id']
+            session.permanent = True  # Make the session permanent
 
             return jsonify({
-                "id": new_user['id'],
-                "email": new_user['emailid']
+                "id": user['id'],
+                "email": user['emailid']
             })
     except pymysql.MySQLError as e:
         print(f"The error '{e}' occurred")

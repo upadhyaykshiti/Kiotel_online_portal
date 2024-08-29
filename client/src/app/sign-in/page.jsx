@@ -1,10 +1,10 @@
+
+
+
 // "use client";
-
-
 
 // import React, { useState } from 'react';
 // import axios from 'axios';
-
 // import { useRouter } from 'next/navigation';
 
 // const SignIn = () => {
@@ -21,13 +21,11 @@
 //       errors.email = 'Email address is invalid';
 //     }
 
-//     const passwordRegex =
-//       /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+//     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 //     if (!password) {
 //       errors.password = 'Password is required';
 //     } else if (!passwordRegex.test(password)) {
-//       errors.password =
-//         'Password must be at least 8 characters long, contain at least one capital letter, one number, and one special character';
+//       errors.password = 'Password must be at least 8 characters long, contain at least one capital letter, one number, and one special character';
 //     }
 //     return errors;
 //   };
@@ -36,34 +34,10 @@
 //     const { name, value } = event.target;
 //     if (name === 'email') {
 //       setEmail(value);
-//       setErrors((prevErrors) => ({ ...prevErrors, email: '' })); // Clear email error on input change
+//       setErrors((prevErrors) => ({ ...prevErrors, email: '' }));
 //     } else if (name === 'password') {
 //       setPassword(value);
-//       setErrors((prevErrors) => ({ ...prevErrors, password: '' })); // Clear password error on input change
-//     }
-//   };
-
-//   const login = async (email, password) => {
-//     try {
-//       const response = await axios.post('http://localhost:8080/api/signin', {
-//         email,
-//         password,
-//       });
-//       return response.data;
-//     } catch (error) {
-//       if (error.response) {
-//         if (error.response.status === 404) {
-//           throw new Error('User not found');
-//         } else {
-//           throw new Error(
-//             'There was an error signing in: ' + error.response.data.error
-//           );
-//         }
-//       } else if (error.request) {
-//         throw new Error('Network error: ' + error.message);
-//       } else {
-//         throw new Error('Error: ' + error.message);
-//       }
+//       setErrors((prevErrors) => ({ ...prevErrors, password: '' }));
 //     }
 //   };
 
@@ -71,7 +45,7 @@
 //     event.preventDefault();
 //     const validationErrors = validate();
 //     setErrors(validationErrors);
-  
+
 //     if (Object.keys(validationErrors).length === 0) {
 //       try {
 //         const response = await axios.post("http://localhost:8080/api/signin", {
@@ -80,7 +54,7 @@
 //         }, {
 //           withCredentials: true // Important for sending/receiving cookies
 //         });
-        
+
 //         if (response.data) {
 //           // Redirect to the Dashboard page
 //           router.push("/Dashboard");
@@ -88,20 +62,19 @@
 //       } catch (error) {
 //         if (error.response) {
 //           if (error.response.status === 401) {
-//             alert("Unauthorized: Invalid email or password");
+//             setErrors({ ...errors, form: 'Unauthorized: Invalid email or password' });
 //           } else {
-//             alert("There was an error signing in: " + error.response.data.error);
+//             setErrors({ ...errors, form: 'There was an error signing in: ' + error.response.data.error });
 //           }
 //         } else if (error.request) {
-//           alert("Network error: " + error.message);
+//           setErrors({ ...errors, form: 'Network error: ' + error.message });
 //         } else {
-//           alert("Error: " + error.message);
+//           setErrors({ ...errors, form: 'Error: ' + error.message });
 //         }
 //         console.error("There was an error signing in!", error);
 //       }
 //     }
 //   };
-
 
 //   return (
 //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200">
@@ -113,6 +86,10 @@
 //                 Sign In
 //               </h2>
 //             </div>
+
+//             {errors.form && (
+//               <p className="text-red-500 text-sm mb-4">{errors.form}</p>
+//             )}
 
 //             <div className="space-y-4">
 //               <div>
@@ -223,7 +200,7 @@ const SignIn = () => {
 
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await axios.post("http://localhost:8080/api/signin", {
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/signin`, {
           email,
           password,
         }, {
@@ -252,12 +229,12 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200">
-      <div className="max-w-6xl w-full h-[90vh] bg-white border border-gray-300 rounded-lg shadow-2xl flex overflow-hidden">
-        <div className="w-1/2 p-8 flex flex-col justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200 p-4 sm:p-0">
+      <div className="max-w-4xl w-full bg-white border border-gray-300 rounded-lg shadow-2xl flex flex-col sm:flex-row overflow-hidden">
+        <div className="w-full sm:w-1/2 p-8 flex flex-col justify-center">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="transition-opacity duration-500 ease-out opacity-100">
-              <h2 className="text-3xl font-extrabold text-center text-blue-700 animate-slideIn">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-blue-700 animate-slideIn">
                 Sign In
               </h2>
             </div>
@@ -314,10 +291,9 @@ const SignIn = () => {
           </form>
         </div>
         <div
-          className="w-1/2 bg-cover bg-center transition-transform duration-300 hover:scale-105 object-cover h-48"
+          className="w-full sm:w-1/2 bg-cover bg-center h-48 sm:h-auto transition-transform duration-300 hover:scale-105 object-cover"
           style={{
             backgroundImage: "url('/Kiotel logo.jpg')",
-            paddingTop: "80vh",
           }}
         ></div>
       </div>

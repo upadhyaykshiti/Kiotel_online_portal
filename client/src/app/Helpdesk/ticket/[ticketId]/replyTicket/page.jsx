@@ -215,7 +215,7 @@ const TicketReplyForm = ({ params }) => {
     if (ticketId) {
       const fetchTicketTitle = async () => {
         try {
-          const response = await axios.get(`http://localhost:8080/api/tickets/${ticketId}`, {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/tickets/${ticketId}`, {
             withCredentials: true,
           });
           setTitle(response.data.title); // Set the title fetched from the API
@@ -229,7 +229,7 @@ const TicketReplyForm = ({ params }) => {
 
     const fetchStatusOptions = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/status`, {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/status`, {
           withCredentials: true,
         });
         setStatusOptions(response.data); // Set dropdown options
@@ -279,7 +279,7 @@ const TicketReplyForm = ({ params }) => {
     }
   
     try {
-      const response = await axios.post(`http://localhost:8080/api/tickets/${ticketId}/reply`, formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/tickets/${ticketId}/reply`, formData, {
         withCredentials: true, // Important for sending/receiving cookies
         headers: {
           "Content-Type": "multipart/form-data",
