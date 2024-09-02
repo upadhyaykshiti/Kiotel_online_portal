@@ -406,7 +406,7 @@ def create_ticket():
             status_id = 1
 
             # Call the stored procedure with the parameters including status_id
-            cursor.callproc('Proc_tblticketstest_UpsertTicket', (0, title, description, attachments_json, status_id))
+            cursor.callproc('Proc_tbltickets_UpsertTicket', (0, title, description, attachments_json, status_id))
             connection.commit()
 
             cursor.execute("SELECT LAST_INSERT_ID() AS ticket_id")
@@ -463,6 +463,10 @@ def get_ticket(ticket_id):
 
 @app.route('/uploads/<filename>', methods=['GET'])
 def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+@app.route('/uploads/replies/<filename>', methods=['GET'])
+def uploaded_file1(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
@@ -590,6 +594,7 @@ def get_replies_by_ticket_id(ticket_id):
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.callproc("Proc_tblreplies_SelectRepliesByTicketId", (ticket_id,))
             replies = cursor.fetchall()
+            print("Query Result:", replies)
 
             # Decode bytes fields to strings, if any
             for reply in replies:

@@ -272,7 +272,7 @@ const TicketReplyForm = ({ params }) => {
         formData.append("attachments", attachments[i]);
       }
     }
-  
+    
     // Log form data
     for (let pair of formData.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);

@@ -822,8 +822,8 @@ export default function Home() {
 
   // Function to convert MST to CST
   const convertMSTtoCST = (mstTime) => {
-    const mstDate = new Date(mstTime + " MST");
-    return mstDate.toLocaleString("en-US", { timeZone: "America/Chicago" });
+    const mstDate = new Date(mstTime + " UTC");
+    return mstDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   };
 
   return (
@@ -904,7 +904,7 @@ export default function Home() {
                     </a>
                   </Link>
                   <p className="text-gray-600">
-                    {`Opened on ${convertMSTtoCST(ticket.created_at)}`}
+                    {`Opened on ${convertMSTtoCST(ticket.created_at)} IST`}
                   </p>
                 </li>
               ))}
