@@ -24,13 +24,28 @@ UPLOAD_FOLDER = './uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the upload directory exists
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# def create_connection():
+#     try:
+#         connection = pymysql.connect(
+#             host="box2272.bluehost.com",
+#             user="travarit_test",
+#             password="Kiotel123!",
+#             database="travarit_login",
+#             cursorclass=pymysql.cursors.DictCursor
+#         )
+#         print("Successfully connected to the database")
+#         return connection
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return None
+
 def create_connection():
     try:
         connection = pymysql.connect(
-            host="box2272.bluehost.com",
-            user="travarit_test",
-            password="Kiotel123!",
-            database="travarit_login",
+            host="64.227.6.9",  # Replace with the public IP address of your VPS
+            user="kshiti",  # Replace with your MySQL user
+            password="Kiotel123!",  # Replace with your MySQL password
+            database="kiotel",  # Replace with your database name
             cursorclass=pymysql.cursors.DictCursor
         )
         print("Successfully connected to the database")
@@ -111,9 +126,58 @@ def get_user_email():
     finally:
         connection.close()
 
+# @app.route("/api/register", methods=["POST"])
+# def register_user():
+#     data = request.json
+#     email = data["email"]
+#     password = data["password"]
+#     fname = data.get("fname")
+#     lname = data.get("lname")
+#     dob = data.get("dob")
+#     address = data.get("address")
+#     account_no = data.get("account_no")
+#     mobileno = data.get("mobileno")
+#     role_id = data.get("role_id", 2)  # Assuming 1 is the default role_id for new users
+
+#     connection = create_connection()
+#     if connection is None:
+#         return jsonify({"error": "Failed to connect to the database"}), 500
+
+#     try:
+#         with connection.cursor() as cursor:
+#             # Check if the user already exists
+#             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
+#             user_exists = cursor.fetchone() is not None
+
+#             if user_exists:
+#                 return jsonify({"error": "User already exists"}), 409
+
+#             # Call the stored procedure to insert the new user
+#             cursor.callproc('Proc_tblusers_Upsert', (0, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
+#             connection.commit()
+
+#             # Fetch the newly created user
+#             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
+#             new_user = cursor.fetchone()
+
+#             session["user_id"] = new_user['id']
+#             session.permanent = True  # Make the session permanent (cookie won't be deleted after the browser is closed)
+
+#             return jsonify({
+#                 "id": new_user['id'],
+#                 "email": new_user['emailid']
+#             })
+#     except pymysql.MySQLError as e:
+#         print(f"The error '{e}' occurred")
+#         return jsonify({"error": "Database query failed"}), 500
+#     finally:
+#         connection.close()
+
+
 @app.route("/api/register", methods=["POST"])
 def register_user():
     data = request.json
+    user_id = data.get("id", 0)  # Get the user ID; default to 0 for new users
     email = data["email"]
     password = data["password"]
     fname = data.get("fname")
@@ -122,7 +186,7 @@ def register_user():
     address = data.get("address")
     account_no = data.get("account_no")
     mobileno = data.get("mobileno")
-    role_id = data.get("role_id", 2)  # Assuming 1 is the default role_id for new users
+    role_id = data.get("role_id", 2)  # Default role_id is 2
 
     connection = create_connection()
     if connection is None:
@@ -130,27 +194,20 @@ def register_user():
 
     try:
         with connection.cursor() as cursor:
-            # Check if the user already exists
-            cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
-            user_exists = cursor.fetchone() is not None
-
-            if user_exists:
-                return jsonify({"error": "User already exists"}), 409
-
-            # Call the stored procedure to insert the new user
-            cursor.callproc('Proc_tblusers_Upsert2', (0, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
+            # If user_id > 0, update the user; otherwise, insert a new user
+            cursor.callproc('Proc_tblusers_Upsert', (user_id, email, password, fname, lname, dob, address, account_no, mobileno, role_id))
             connection.commit()
 
-            # Fetch the newly created user
+            # Fetch the user (whether newly created or updated)
             cursor.execute("SELECT * FROM tblusers WHERE emailid = %s", (email,))
-            new_user = cursor.fetchone()
+            user = cursor.fetchone()
 
-            session["user_id"] = new_user['id']
-            session.permanent = True  # Make the session permanent (cookie won't be deleted after the browser is closed)
+            session["user_id"] = user['id']
+            session.permanent = True  # Make the session permanent
 
             return jsonify({
-                "id": new_user['id'],
-                "email": new_user['emailid']
+                "id": user['id'],
+                "email": user['emailid']
             })
     except pymysql.MySQLError as e:
         print(f"The error '{e}' occurred")
@@ -349,7 +406,7 @@ def create_ticket():
             status_id = 1
 
             # Call the stored procedure with the parameters including status_id
-            cursor.callproc('Proc_tblticketstest_UpsertTicket', (0, title, description, attachments_json, status_id))
+            cursor.callproc('Proc_tbltickets_UpsertTicket', (0, title, description, attachments_json, status_id))
             connection.commit()
 
             cursor.execute("SELECT LAST_INSERT_ID() AS ticket_id")
@@ -406,6 +463,10 @@ def get_ticket(ticket_id):
 
 @app.route('/uploads/<filename>', methods=['GET'])
 def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+@app.route('/uploads/replies/<filename>', methods=['GET'])
+def uploaded_file1(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 
@@ -533,6 +594,7 @@ def get_replies_by_ticket_id(ticket_id):
         with connection.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.callproc("Proc_tblreplies_SelectRepliesByTicketId", (ticket_id,))
             replies = cursor.fetchall()
+            print("Query Result:", replies)
 
             # Decode bytes fields to strings, if any
             for reply in replies:

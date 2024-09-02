@@ -93,7 +93,7 @@ export default function OpenedTickets() {
   useEffect(() => {
     const fetchOpenedTickets = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/opened_tickets", {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/opened_tickets`, {
           withCredentials: true,
         });
         setOpenedTickets(response.data);
