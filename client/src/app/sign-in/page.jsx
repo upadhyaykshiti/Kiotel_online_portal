@@ -1,303 +1,243 @@
 
-
-
-// "use client";
-
-// import React, { useState } from 'react';
-// import axios from 'axios';
-// import { useRouter } from 'next/navigation';
-
-// const SignIn = () => {
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [errors, setErrors] = useState({});
-//   const router = useRouter();
-
-//   const validate = () => {
-//     const errors = {};
-//     if (!email) {
-//       errors.email = 'Email is required';
-//     } else if (!/\S+@\S+\.\S+/.test(email)) {
-//       errors.email = 'Email address is invalid';
-//     }
-
-//     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-//     if (!password) {
-//       errors.password = 'Password is required';
-//     } else if (!passwordRegex.test(password)) {
-//       errors.password = 'Password must be at least 8 characters long, contain at least one capital letter, one number, and one special character';
-//     }
-//     return errors;
-//   };
-
-//   const handleChange = (event) => {
-//     const { name, value } = event.target;
-//     if (name === 'email') {
-//       setEmail(value);
-//       setErrors((prevErrors) => ({ ...prevErrors, email: '' }));
-//     } else if (name === 'password') {
-//       setPassword(value);
-//       setErrors((prevErrors) => ({ ...prevErrors, password: '' }));
-//     }
-//   };
-
-//   const handleSubmit = async (event) => {
-//     event.preventDefault();
-//     const validationErrors = validate();
-//     setErrors(validationErrors);
-
-//     if (Object.keys(validationErrors).length === 0) {
-//       try {
-//         const response = await axios.post("http://localhost:8080/api/signin", {
-//           email,
-//           password,
-//         }, {
-//           withCredentials: true // Important for sending/receiving cookies
-//         });
-
-//         if (response.data) {
-//           // Redirect to the Dashboard page
-//           router.push("/Dashboard");
-//         }
-//       } catch (error) {
-//         if (error.response) {
-//           if (error.response.status === 401) {
-//             setErrors({ ...errors, form: 'Unauthorized: Invalid email or password' });
-//           } else {
-//             setErrors({ ...errors, form: 'There was an error signing in: ' + error.response.data.error });
-//           }
-//         } else if (error.request) {
-//           setErrors({ ...errors, form: 'Network error: ' + error.message });
-//         } else {
-//           setErrors({ ...errors, form: 'Error: ' + error.message });
-//         }
-//         console.error("There was an error signing in!", error);
-//       }
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200">
-//       <div className="max-w-6xl w-full h-[90vh] bg-white border border-gray-300 rounded-lg shadow-2xl flex overflow-hidden">
-//         <div className="w-1/2 p-8 flex flex-col justify-center">
-//           <form onSubmit={handleSubmit} className="space-y-6">
-//             <div className="transition-opacity duration-500 ease-out opacity-100">
-//               <h2 className="text-3xl font-extrabold text-center text-blue-700 animate-slideIn">
-//                 Sign In
-//               </h2>
-//             </div>
-
-//             {errors.form && (
-//               <p className="text-red-500 text-sm mb-4">{errors.form}</p>
-//             )}
-
-//             <div className="space-y-4">
-//               <div>
-//                 <label className="block text-gray-700 font-medium">Email</label>
-//                 <input
-//                   type="text"
-//                   name="email"
-//                   value={email}
-//                   onChange={handleChange}
-//                   className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition duration-200 ${
-//                     errors.email ? 'border-red-500' : 'border-gray-300'
-//                   }`}
-//                 />
-//                 {errors.email && (
-//                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-//                 )}
-//               </div>
-//               <div>
-//                 <label className="block text-gray-700 font-medium">
-//                   Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   name="password"
-//                   value={password}
-//                   onChange={handleChange}
-//                   className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition duration-200 ${
-//                     errors.password ? 'border-red-500' : 'border-gray-300'
-//                   }`}
-//                 />
-//                 {errors.password && (
-//                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-//                 )}
-//               </div>
-//             </div>
-//             <button
-//               type="submit"
-//               className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
-//             >
-//               Sign In
-//             </button>
-//             <div className="flex justify-between py-4">
-//               <a href="/forgotpassword" className="text-blue-500 hover:underline">
-//                 Forgot Password?
-//               </a>
-//             </div>
-//           </form>
-//         </div>
-//         <div
-//           className="w-1/2 bg-cover bg-center transition-transform duration-300 hover:scale-105 object-cover h-48"
-//           style={{
-//             backgroundImage: "url('/Kiotel logo.jpg')",
-//             paddingTop: "80vh",
-//           }}
-//         ></div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SignIn;
-
-
 "use client";
 
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+
   const router = useRouter();
 
+  // 🔒 Special account check
+  const isClockinUser = email.trim().toLowerCase() === "clockin@kiotel.co";
+
+  // Generate or retrieve a unique device ID for this browser
+  const getDeviceId = () => {
+    let deviceId = localStorage.getItem("browser_device_id");
+    if (!deviceId) {
+      // Create a random device ID
+      deviceId = "dev_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem("browser_device_id", deviceId);
+    }
+    return deviceId;
+  };
+
+  // Validation
   const validate = () => {
-    const errors = {};
-    if (!email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = 'Email address is invalid';
-    }
+    const errs = {};
+    if (!email) errs.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(email))
+      errs.email = "Invalid email address";
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!password) {
-      errors.password = 'Password is required';
-    } else if (!passwordRegex.test(password)) {
-      errors.password = 'Password must be at least 8 characters long, contain at least one capital letter, one number, and one special character';
-    }
-    return errors;
+    if (!password) errs.password = "Password is required";
+
+    return errs;
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    if (name === 'email') {
-      setEmail(value);
-      setErrors((prevErrors) => ({ ...prevErrors, email: '' }));
-    } else if (name === 'password') {
-      setPassword(value);
-      setErrors((prevErrors) => ({ ...prevErrors, password: '' }));
-    }
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const v = validate();
+    setErrors(v);
+    if (Object.keys(v).length !== 0) return;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const validationErrors = validate();
-    setErrors(validationErrors);
+    const deviceId = getDeviceId();
 
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/signin`, {
-          email,
-          password,
-        }, {
-          withCredentials: true // Important for sending/receiving cookies
-        });
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+        { email, password, device_id: deviceId },
+        { withCredentials: true }
+      );
 
-        if (response.data) {
-          // Redirect to the Dashboard page
+      // if (res.status === 200 && res.data) {
+      //   const { id, email, account_no, fname, lname, role_id } = res.data;
+        
+      //   // Store in localStorage for frontend access
+      //   localStorage.setItem("userId", id);
+      //   localStorage.setItem("email", email);
+      //   localStorage.setItem("uniqueId", account_no);
+      //   if (fname) localStorage.setItem("fname", fname);
+      //   if (lname) localStorage.setItem("lname", lname);
+      //   if (role_id) localStorage.setItem("role_id", role_id);
+        
+      //   // 🔄 Redirect based on user email
+      //   if (isClockinUser) {
+      //     router.push("/Attendance");
+      //   } else {
+      //     router.push("/Dashboard");
+      //   }
+      // }
+            if (res.status === 200 && res.data) {
+        const { id, email, account_no, fname, lname, role_id } = res.data;
+        
+        // Store in localStorage for frontend access
+        localStorage.setItem("userId", id);
+        localStorage.setItem("email", email);
+        localStorage.setItem("uniqueId", account_no);
+        if (fname) localStorage.setItem("fname", fname);
+        if (lname) localStorage.setItem("lname", lname);
+        if (role_id) localStorage.setItem("role_id", role_id);
+        
+        // 🔄 Redirect based on user email and role
+        if (isClockinUser) {
+          router.push("/Attendance");
+        } else if (String(role_id) === "4") {
+          router.push("/customer");
+        } else {
           router.push("/Dashboard");
         }
-      } catch (error) {
-        if (error.response) {
-          if (error.response.status === 401) {
-            setErrors({ ...errors, form: 'Unauthorized: Invalid email or password' });
-          } else {
-            setErrors({ ...errors, form: 'There was an error signing in: ' + error.response.data.error });
-          }
-        } else if (error.request) {
-          setErrors({ ...errors, form: 'Network error: ' + error.message });
-        } else {
-          setErrors({ ...errors, form: 'Error: ' + error.message });
-        }
-        console.error("There was an error signing in!", error);
+      }
+    } catch (err) {
+      // 🔒 SECURITY FIX: 
+      // Check if it's the specific pending approval response
+      if (err.response && err.response.data && err.response.data.status === "pending_approval") {
+        setErrors({
+          form: "This browser is pending admin approval. Please wait for an administrator to approve your device.",
+        });
+      } else {
+        // Generic message for invalid credentials / deleted accounts
+        setErrors({
+          form: "Invalid email or password",
+        });
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200 p-4 sm:p-0">
-      <div className="max-w-4xl w-full bg-white border border-gray-300 rounded-lg shadow-2xl flex flex-col sm:flex-row overflow-hidden">
-        <div className="w-full sm:w-1/2 p-8 flex flex-col justify-center">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="transition-opacity duration-500 ease-out opacity-100">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-blue-700 animate-slideIn">
+    <>
+      <style jsx global>{`
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+          display: none;
+        }
+
+        input[type="password"]::-webkit-textfield-decoration-container {
+          display: none !important;
+        }
+      `}</style>
+
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 to-blue-200 p-4">
+        <div className="max-w-4xl w-full bg-white rounded-lg shadow-2xl flex overflow-hidden">
+          <div className="w-full sm:w-1/2 p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h2 className="text-3xl font-extrabold text-center text-blue-700">
                 Sign In
               </h2>
-            </div>
 
-            {errors.form && (
-              <p className="text-red-500 text-sm mb-4">{errors.form}</p>
-            )}
+              {/* Dynamic Form Error Display */}
+              {errors.form && (
+                <div className={`border px-4 py-3 rounded-lg text-sm text-center font-medium ${
+                  errors.form.includes("pending admin approval") 
+                    ? "bg-yellow-50 border-yellow-200 text-yellow-700" 
+                    : "bg-red-50 border-red-200 text-red-600"
+                }`}>
+                  {errors.form}
+                </div>
+              )}
 
-            <div className="space-y-4">
+              {/* EMAIL */}
               <div>
-                <label className="block text-gray-700 font-medium">Email</label>
+                <label className="block font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="text"
-                  name="email"
                   value={email}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition duration-200 ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
+                  autoComplete="off"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors((p) => ({ ...p, email: "", form: "" }));
+                  }}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors ${
+                    errors.email ? "border-red-500" : "border-gray-300 hover:border-gray-400"
                   }`}
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
               </div>
+
+              {/* PASSWORD */}
               <div>
-                <label className="block text-gray-700 font-medium">
+                <label className="block font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition duration-200 ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
+                <div className="relative">
+                  <input
+                    type={
+                      isClockinUser
+                        ? "password"
+                        : showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((p) => ({ ...p, password: "", form: "" }));
+                    }}
+                    autoComplete={
+                      isClockinUser ? "new-password" : "current-password"
+                    }
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    name={isClockinUser ? "secure_clockin_pwd_x9" : "password"}
+                    id={isClockinUser ? "secure_clockin_pwd_x9" : "password"}
+                    aria-autocomplete={isClockinUser ? "none" : "list"}
+                    onPaste={isClockinUser ? (e) => e.preventDefault() : undefined}
+                    onCopy={isClockinUser ? (e) => e.preventDefault() : undefined}
+                    onCut={isClockinUser ? (e) => e.preventDefault() : undefined}
+                    onKeyDown={
+                      isClockinUser
+                        ? (e) => {
+                            if (e.ctrlKey || e.metaKey) {
+                              const blocked = ["c", "v", "x"];
+                              if (blocked.includes(e.key.toLowerCase())) {
+                                e.preventDefault();
+                              }
+                            }
+                          }
+                        : undefined
+                    }
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-colors pr-16 ${
+                      errors.password ? "border-red-500" : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  />
+                  {!isClockinUser && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  )}
+                </div>
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1">{errors.password}</p>
                 )}
               </div>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
-            >
-              Sign In
-            </button>
-            <div className="flex justify-between py-4">
-              <a href="/forgotpassword" className="text-blue-500 hover:underline">
-                Forgot Password?
-              </a>
-            </div>
-          </form>
+
+              <button
+                type="submit"
+                className="w-full py-3 mt-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Sign In
+              </button>
+            </form>
+          </div>
+
+          <div
+            className="hidden sm:block w-1/2 bg-cover bg-center border-l border-gray-100"
+            style={{ backgroundImage: "url('/Kiotel logo.jpg')" }}
+          />
         </div>
-        <div
-          className="w-full sm:w-1/2 bg-cover bg-center h-48 sm:h-auto transition-transform duration-300 hover:scale-105 object-cover"
-          style={{
-            backgroundImage: "url('/Kiotel logo.jpg')",
-          }}
-        ></div>
       </div>
-    </div>
+    </>
   );
 };
 

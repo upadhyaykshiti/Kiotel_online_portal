@@ -6,3 +6,9 @@ flask-session
 redis
 flask-cors
 pymsql
+Flask-Mail
+Werkzeug==2.3.3
+itsdangerous==2.1.2
+Jinja2==3.1.2
+click==8.1.6
+Flask-Login==0.6.2
