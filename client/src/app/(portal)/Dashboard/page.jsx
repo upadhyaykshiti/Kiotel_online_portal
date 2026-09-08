@@ -11,7 +11,7 @@ import ProtectedRoute from "../../../context/ProtectedRoute";
  * ONLY these emails can see Attendance (and NOTHING else)
  */
 const ATTENDANCE_ONLY_EMAILS = [
-  "Clockin@kiotel.co",
+  "clockin@kiotel.co",
 ];
 
 /**
@@ -26,7 +26,9 @@ const ATTENDANCE_WITH_OTHER_TABS_EMAILS = [
   "avency@kiotel.co",
   "dhruvp@kiotel.co",
   "omkarc@kiotel.co",
+  "ahirvency10@gmail.com",
   "arbaz.p@valianthotels.com",
+  "vikash@valianthotels.com",
 ];
 
 /**
@@ -123,11 +125,15 @@ function Dashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isProfileMenuOpen]);
 
-  const isAttendanceOnlyUser = userEmail && ATTENDANCE_ONLY_EMAILS.includes(userEmail);
-  const canSeeAttendanceWithOtherTabs = userEmail && ATTENDANCE_WITH_OTHER_TABS_EMAILS.includes(userEmail);
+  // Matched case-insensitively: the address stored on the account does not
+  // always use the same casing as the lists above.
+  const normalizedEmail = String(userEmail || "").trim().toLowerCase();
+
+  const isAttendanceOnlyUser = !!normalizedEmail && ATTENDANCE_ONLY_EMAILS.includes(normalizedEmail);
+  const canSeeAttendanceWithOtherTabs = !!normalizedEmail && ATTENDANCE_WITH_OTHER_TABS_EMAILS.includes(normalizedEmail);
   
   // ✅ Check if user is in the special Admin Attendance list
-  const canSeeAdminAttendance = userEmail && ADMIN_ATTENDANCE_ACCESS_EMAILS.includes(userEmail);
+  const canSeeAdminAttendance = !!normalizedEmail && ADMIN_ATTENDANCE_ACCESS_EMAILS.includes(normalizedEmail);
 
   const toggleProfileMenu = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen);

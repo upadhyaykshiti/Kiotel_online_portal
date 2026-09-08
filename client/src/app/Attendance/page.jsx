@@ -18,7 +18,7 @@ import {
 import { format } from "date-fns";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "/api";
-const ALLOWED_EMAIL = "Clockin@kiotel.co";
+const ALLOWED_EMAIL = "clockin@kiotel.co";
 
 const DIRECT_SHIFT_EMAILS = [
   "shuvam.r@kiotel.co",
@@ -29,7 +29,9 @@ const DIRECT_SHIFT_EMAILS = [
   "avency@kiotel.co",
   "dhruvp@kiotel.co",
   "omkarc@kiotel.co",
+  "ahirvency10@gmail.com",
   "arbaz.p@valianthotels.com",
+  "vikash@valianthotels.com",
 ];
 
 // 🔴 DIRECT SHIFT USER GROUPS (subset of DIRECT_SHIFT_EMAILS, keep lowercase) 🔴
@@ -43,11 +45,13 @@ const DEV_TEAM_EMAILS = [
   "avency@kiotel.co",
   "dhruvp@kiotel.co",
   "omkarc@kiotel.co",
+  "ahirvency10@gmail.com",
 ];
 
 // Office admins -> only the ADMIN shift
 const OFFICE_ADMIN_DIRECT_EMAILS = [
   "arbaz.p@valianthotels.com",
+  "vikash@valianthotels.com",
 ];
 
 // 🔴 ADD YOUR SPECIFIC EMPLOYEE IDs HERE 🔴
@@ -153,14 +157,18 @@ useEffect(() => {
         setUserUniqueID(userData.unique_id);
         setLoggedInUser(userData);
 
-        if (email !== ALLOWED_EMAIL && !DIRECT_SHIFT_EMAILS.includes(email)) {
+        // Compare case-insensitively — the address stored on the account does
+        // not always use the same casing as the lists above.
+        const normalized = String(email || "").trim().toLowerCase();
+
+        if (normalized !== ALLOWED_EMAIL && !DIRECT_SHIFT_EMAILS.includes(normalized)) {
           router.push("/sign-in?error=access_denied");
           return;
         }
 
         setIsAuthorized(true);
 
-        if (DIRECT_SHIFT_EMAILS.includes(email)) {
+        if (DIRECT_SHIFT_EMAILS.includes(normalized)) {
           setIsDirectShiftUser(true);
           setAccountNo(userData.unique_id);
 
