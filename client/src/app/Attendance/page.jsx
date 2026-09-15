@@ -32,6 +32,7 @@ const DIRECT_SHIFT_EMAILS = [
   "ahirvency10@gmail.com",
   "arbaz.p@valianthotels.com",
   "vikash@valianthotels.com",
+  "sarthaksmn720@gmail.com",
 ];
 
 // 🔴 DIRECT SHIFT USER GROUPS (subset of DIRECT_SHIFT_EMAILS, keep lowercase) 🔴
@@ -52,6 +53,7 @@ const DEV_TEAM_EMAILS = [
 const OFFICE_ADMIN_DIRECT_EMAILS = [
   "arbaz.p@valianthotels.com",
   "vikash@valianthotels.com",
+  "sarthaksmn720@gmail.com",
 ];
 
 // 🔴 ADD YOUR SPECIFIC EMPLOYEE IDs HERE 🔴
