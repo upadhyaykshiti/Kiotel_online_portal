@@ -1,0 +1,12 @@
+{
+  "name": "kiotel-portal-front",
+  "private": true,
+  "scripts": {
+    "prepare": "lefthook install",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "knip": "^6.34.0",
+    "lefthook": "^2.1.12"
+  }
+}

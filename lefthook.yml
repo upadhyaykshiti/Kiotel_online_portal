@@ -1,0 +1,52 @@
+# https://lefthook.dev/configuration/
+# Skip all: LEFTHOOK=0
+
+pre-commit:
+  parallel: true
+  commands:
+    lint-client:
+      root: client
+      glob: "*.{ts,tsx,js,jsx,mjs}"
+      run: npx eslint --quiet {staged_files}
+
+commit-msg:
+  commands:
+    scrum-format:
+      run: |
+        first="$(head -n 1 "{1}" | tr -d '\r')"
+        case "$first" in Merge\ *|Revert\ *) exit 0 ;; esac
+        printf '%s\n' "$first" | grep -Eq '^SCRUM-[0-9]+: .+' || {
+          echo "Expected: SCRUM-<ID>: <message>"
+          echo "Got: ${first:-<empty>}"
+          exit 1
+        }
+
+pre-push:
+  commands:
+    commit-format:
+      run: |
+        branch="$(git rev-parse --abbrev-ref HEAD)"
+        if git rev-parse --verify "origin/${branch}" >/dev/null 2>&1; then
+          range="origin/${branch}..HEAD"
+        else
+          range="$(git merge-base HEAD origin/main 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD"
+        fi
+        [ "$(git rev-list --count "$range" 2>/dev/null || echo 0)" = "0" ] && exit 0
+        bad=0
+        while IFS= read -r msg; do
+          [ -z "$msg" ] && continue
+          case "$msg" in Merge\ *|Revert\ *) continue ;; esac
+          printf '%s\n' "$msg" | grep -Eq '^SCRUM-[0-9]+: .+' || {
+            echo "Invalid commit subject: $msg"
+            bad=1
+          }
+        done <<EOF
+        $(git log --format=%s "$range")
+        EOF
+        exit "$bad"
+    lint:
+      run: npm --prefix client run lint:errors
+    knip:
+      run: npm run knip
+    build:
+      run: npm --prefix client run build

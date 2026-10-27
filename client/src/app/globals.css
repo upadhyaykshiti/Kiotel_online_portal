@@ -1,5 +1,74 @@
+/* src/app/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for ThreeMonthView */
+.three-month-view .month-header {
+  background-color: #e0f2fe;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #bfdbfe;
+}
 
+.three-month-view .employee-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.three-month-view .day-cell {
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.three-month-view .day-cell.today {
+  border: 2px solid #3b82f6;
+  background-color: #dbeafe;
+}
+
+.three-month-view .day-cell.shift {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.three-month-view .day-cell.leave {
+  background-color: #fef3c7;
+  color: #f59e0b;
+  border: 1px solid #fbbf24;
+}
+
+.three-month-view .day-cell.off {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+/* TipTap placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Task list */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+ul[data-type="taskList"] li > label {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}

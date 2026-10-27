@@ -1,0 +1,29 @@
+# Without this the build context is ~2.6 GB: node_modules (981 MB) plus a
+# stale .next (1.6 GB). Both are regenerated inside the image.
+node_modules
+.next
+out
+
+.git
+.gitignore
+
+# NEXT_PUBLIC_* values are supplied as build args by compose, not from a file
+# copied into the image.
+.env
+.env.*
+
+npm-debug.log*
+.npm
+README.md
+Dockerfile
+.dockerignore
+.eslintrc.json
+
+# Docker/ops files. None is read by `next build`, and without these lines
+# editing the compose file or docs busts the `COPY . .` layer and forces a full
+# multi-minute rebuild.
+docker-compose*.yml
+DOCKER.md
+
+# PM2 is replaced by Docker's restart policy.
+ecosystem.config.js

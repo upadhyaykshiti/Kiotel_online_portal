@@ -15,6 +15,7 @@ develop-eggs/
 *.pyc
 venv/
 env/
+uploads/
 _pycache_/
 *.pyo
 .pytest_cache/

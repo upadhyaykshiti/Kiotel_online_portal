@@ -1,0 +1,36 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [],
+      "project": []
+    },
+    "client": {
+      "project": [
+        "src/**/*.{js,jsx,ts,tsx,css}"
+      ],
+      "paths": {
+        "@/*": ["./src/*"]
+      }
+    }
+  },
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "devDependencies": "error",
+    "optionalPeerDependencies": "error",
+    "unlisted": "error",
+    "binaries": "error",
+    "unresolved": "error",
+    "exports": "error",
+    "types": "error",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off",
+    "namespaceMembers": "off",
+    "duplicates": "error",
+    "cycles": "warn"
+  },
+  "ignoreExportsUsedInFile": true,
+  "treatConfigHintsAsErrors": false
+}

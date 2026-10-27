@@ -1,0 +1,17 @@
+# Dependencies (root + workspaces)
+node_modules/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs / OS / IDE
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.code-workspace
+
+# Lefthook local
+lefthook-local.yml
